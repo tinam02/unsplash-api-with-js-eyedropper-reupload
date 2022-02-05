@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color picker</title>
+    <style>
+      body {
+        background-color: rgb(255, 255, 255);
+        color: rgb(0, 0, 0);
+        margin: auto;
+        display: grid;
+      }
+      #container {
+        margin: 10%;
+        width: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-self: center;
+      }
+      #image {
+        border: 1px solid black;
+        border-radius: 8px;
+        width: 100%;
+        height: 30vh;
+        background-position: center center;
+        background-size: cover;
+      }
+      button {
+        outline: none;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 20px;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 13px 23px;
+        border: 1px solid #222222;
+        transition: box-shadow 0.2s ease 0s, -ms-transform 0.1s ease 0s,
+          -webkit-transform 0.1s ease 0s, transform 0.1s ease 0s;
+        background: #fff;
+        color: #222222;
+      }
+      #getImg {
+        display: inline-block;
+        outline: none;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 20px;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 14px 24px;
+        border: none;
+        transition: box-shadow 0.2s ease 0s, -ms-transform 0.1s ease 0s,
+          -webkit-transform 0.1s ease 0s, transform 0.1s ease 0s;
+        background: linear-gradient(
+          to right,
+          rgb(230, 30, 77) 0%,
+          rgb(227, 28, 95) 50%,
+          rgb(215, 4, 102) 100%
+        );
+        color: #fff;
+      }
+      button:hover {
+        border-color: #000000;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.575);
+        background: #f7f7f7;
+      }
+      #result {
+        color: #ffff;
+        padding: 0px 10px;
+        border-radius: 8px;
+        background: rgb(0, 0, 0);
+      }
+      #result,
+      #getImg {
+        margin: 4%;
+      }
+      a {
+        margin-top: 4%;
+        text-decoration: underline;
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <button id="getImg">Get image from Unsplash</button>
+      <div id="image"></div>
+      <a id="author">Source</a>
+      <span id="result">...</span>
+      <button id="start-button">Open the eyedropper</button>
+    </div>
+
+    <script>
+      // api
+      const apiKey = "ArwGdO9esJkYP3rUtlVDbB_4KIFDp1fvG5v4Nuwkhag";
+      const apiURL = `https://api.unsplash.com/photos/random/?client_id=${apiKey}`;
+      const imgEl = document.getElementById("image");
+      const author = document.getElementById("author");
+      fetch(apiURL)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          randomImg = data.urls.regular;
+          authorName = data.user.portfolio_url;
+          return randomImg, authorName;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      const getrandom = document.getElementById("getImg");
+      getrandom.addEventListener("click", function (e) {
+        imgEl.style.backgroundImage = `none`;
+        imgEl.style.backgroundImage = `url(${randomImg})`;
+        if (authorName !== null) {
+          author.setAttribute("href", authorName);
+        } else {
+          author.style.display = "none";
+        }
+      });
+
+      // eyedropper
+      document.getElementById("start-button").addEventListener("click", () => {
+        const resultElement = document.getElementById("result");
+
+        if (!window.EyeDropper) {
+          resultElement.textContent =
+            "Your browser does not support the EyeDropper API. Switch to Chrome or Firefox";
+          return;
+        }
+
+        const eyeDropper = new EyeDropper();
+
+        eyeDropper
+          .open()
+          .then((result) => {
+            resultElement.textContent = result.sRGBHex;
+            document.querySelector("body").style.backgroundColor =
+              result.sRGBHex;
+          })
+          .catch((e) => {
+            resultElement.textContent = e;
+          });
+      });
+    </script>
+  </body>
+</html>
